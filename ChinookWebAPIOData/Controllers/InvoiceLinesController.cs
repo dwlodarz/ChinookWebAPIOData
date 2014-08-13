@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class MediaTypeController : ODataController
+    public class InvoiceLinesController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool MediaTypeExists(int key)
+        private bool InvoiceLineExists(int key)
         {
-            return db.MediaTypes.Any(p => p.MediaTypeId == key);
+            return db.InvoiceLines.Any(p => p.InvoiceLineId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<MediaType> Get()
+        public IQueryable<InvoiceLine> Get()
         {
-            return db.MediaTypes;
+            return db.InvoiceLines;
         }
         [EnableQuery]
-        public SingleResult<MediaType> Get([FromODataUri] int key)
+        public SingleResult<InvoiceLine> Get([FromODataUri] int key)
         {
-            IQueryable<MediaType> result = db.MediaTypes.Where(p => p.MediaTypeId == key);
+            IQueryable<InvoiceLine> result = db.InvoiceLines.Where(p => p.InvoiceLineId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(MediaType MediaType)
+        public async Task<IHttpActionResult> Post(InvoiceLine InvoiceLine)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.MediaTypes.Add(MediaType);
+            db.InvoiceLines.Add(InvoiceLine);
             await db.SaveChangesAsync();
-            return Created(MediaType);
+            return Created(InvoiceLine);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<MediaType> MediaType)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<InvoiceLine> InvoiceLine)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.MediaTypes.FindAsync(key);
+            var entity = await db.InvoiceLines.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            MediaType.Patch(entity);
+            InvoiceLine.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MediaTypeExists(key))
+                if (!InvoiceLineExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, MediaType update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, InvoiceLine update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.MediaTypeId)
+            if (key != update.InvoiceLineId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MediaTypeExists(key))
+                if (!InvoiceLineExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var MediaType = await db.MediaTypes.FindAsync(key);
-            if (MediaType == null)
+            var InvoiceLine = await db.InvoiceLines.FindAsync(key);
+            if (InvoiceLine == null)
             {
                 return NotFound();
             }
-            db.MediaTypes.Remove(MediaType);
+            db.InvoiceLines.Remove(InvoiceLine);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

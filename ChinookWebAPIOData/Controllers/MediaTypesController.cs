@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class TrackController : ODataController
+    public class MediaTypesController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool TrackExists(int key)
+        private bool MediaTypeExists(int key)
         {
-            return db.Tracks.Any(p => p.TrackId == key);
+            return db.MediaTypes.Any(p => p.MediaTypeId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<Track> Get()
+        public IQueryable<MediaType> Get()
         {
-            return db.Tracks;
+            return db.MediaTypes;
         }
         [EnableQuery]
-        public SingleResult<Track> Get([FromODataUri] int key)
+        public SingleResult<MediaType> Get([FromODataUri] int key)
         {
-            IQueryable<Track> result = db.Tracks.Where(p => p.TrackId == key);
+            IQueryable<MediaType> result = db.MediaTypes.Where(p => p.MediaTypeId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(Track Track)
+        public async Task<IHttpActionResult> Post(MediaType MediaType)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.Tracks.Add(Track);
+            db.MediaTypes.Add(MediaType);
             await db.SaveChangesAsync();
-            return Created(Track);
+            return Created(MediaType);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Track> Track)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<MediaType> MediaType)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.Tracks.FindAsync(key);
+            var entity = await db.MediaTypes.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            Track.Patch(entity);
+            MediaType.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TrackExists(key))
+                if (!MediaTypeExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, Track update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, MediaType update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.TrackId)
+            if (key != update.MediaTypeId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TrackExists(key))
+                if (!MediaTypeExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var Track = await db.Tracks.FindAsync(key);
-            if (Track == null)
+            var MediaType = await db.MediaTypes.FindAsync(key);
+            if (MediaType == null)
             {
                 return NotFound();
             }
-            db.Tracks.Remove(Track);
+            db.MediaTypes.Remove(MediaType);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

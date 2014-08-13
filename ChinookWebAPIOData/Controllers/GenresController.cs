@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class InvoiceLineController : ODataController
+    public class GenresController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool InvoiceLineExists(int key)
+        private bool GenreExists(int key)
         {
-            return db.InvoiceLines.Any(p => p.InvoiceLineId == key);
+            return db.Genres.Any(p => p.GenreId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<InvoiceLine> Get()
+        public IQueryable<Genre> Get()
         {
-            return db.InvoiceLines;
+            return db.Genres;
         }
         [EnableQuery]
-        public SingleResult<InvoiceLine> Get([FromODataUri] int key)
+        public SingleResult<Genre> Get([FromODataUri] int key)
         {
-            IQueryable<InvoiceLine> result = db.InvoiceLines.Where(p => p.InvoiceLineId == key);
+            IQueryable<Genre> result = db.Genres.Where(p => p.GenreId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(InvoiceLine InvoiceLine)
+        public async Task<IHttpActionResult> Post(Genre Genre)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.InvoiceLines.Add(InvoiceLine);
+            db.Genres.Add(Genre);
             await db.SaveChangesAsync();
-            return Created(InvoiceLine);
+            return Created(Genre);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<InvoiceLine> InvoiceLine)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Genre> Genre)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.InvoiceLines.FindAsync(key);
+            var entity = await db.Genres.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            InvoiceLine.Patch(entity);
+            Genre.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InvoiceLineExists(key))
+                if (!GenreExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, InvoiceLine update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, Genre update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.InvoiceLineId)
+            if (key != update.GenreId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InvoiceLineExists(key))
+                if (!GenreExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var InvoiceLine = await db.InvoiceLines.FindAsync(key);
-            if (InvoiceLine == null)
+            var Genre = await db.Genres.FindAsync(key);
+            if (Genre == null)
             {
                 return NotFound();
             }
-            db.InvoiceLines.Remove(InvoiceLine);
+            db.Genres.Remove(Genre);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

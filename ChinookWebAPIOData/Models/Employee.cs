@@ -30,9 +30,9 @@ namespace ChinookWebAPIOData.Models
 
         public int? ReportsTo { get; set; }
 
-        public DateTime? BirthDate { get; set; }
+        public DateTimeOffset? BirthDate { get; set; }
 
-        public DateTime? HireDate { get; set; }
+        public DateTimeOffset? HireDate { get; set; }
 
         [StringLength(70)]
         public string Address { get; set; }

@@ -18,7 +18,7 @@ namespace ChinookWebAPIOData.Models
 
         public int CustomerId { get; set; }
 
-        public DateTime InvoiceDate { get; set; }
+        public DateTimeOffset InvoiceDate { get; set; }
 
         [StringLength(70)]
         public string BillingAddress { get; set; }

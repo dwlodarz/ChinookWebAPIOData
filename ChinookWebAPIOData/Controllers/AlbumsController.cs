@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class EmployeeController : ODataController
+    public class AlbumsController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool EmployeeExists(int key)
+        private bool AlbumExists(int key)
         {
-            return db.Employees.Any(p => p.EmployeeId == key);
+            return db.Albums.Any(p => p.AlbumId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<Employee> Get()
+        public IQueryable<Album> Get()
         {
-            return db.Employees;
+            return db.Albums;
         }
         [EnableQuery]
-        public SingleResult<Employee> Get([FromODataUri] int key)
+        public SingleResult<Album> Get([FromODataUri] int key)
         {
-            IQueryable<Employee> result = db.Employees.Where(p => p.EmployeeId == key);
+            IQueryable<Album> result = db.Albums.Where(p => p.AlbumId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(Employee Employee)
+        public async Task<IHttpActionResult> Post(Album album)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.Employees.Add(Employee);
+            db.Albums.Add(album);
             await db.SaveChangesAsync();
-            return Created(Employee);
+            return Created(album);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Employee> Employee)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Album> Album)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.Employees.FindAsync(key);
+            var entity = await db.Albums.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            Employee.Patch(entity);
+            Album.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeExists(key))
+                if (!AlbumExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, Employee update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, Album update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.EmployeeId)
+            if (key != update.AlbumId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeExists(key))
+                if (!AlbumExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var Employee = await db.Employees.FindAsync(key);
-            if (Employee == null)
+            var Album = await db.Albums.FindAsync(key);
+            if (Album == null)
             {
                 return NotFound();
             }
-            db.Employees.Remove(Employee);
+            db.Albums.Remove(Album);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

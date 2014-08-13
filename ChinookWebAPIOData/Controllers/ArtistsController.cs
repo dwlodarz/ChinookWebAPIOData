@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class CustomerController : ODataController
+    public class ArtistsController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool CustomerExists(int key)
+        private bool ArtistExists(int key)
         {
-            return db.Customers.Any(p => p.CustomerId == key);
+            return db.Artists.Any(p => p.ArtistId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<Customer> Get()
+        public IQueryable<Artist> Get()
         {
-            return db.Customers;
+            return db.Artists;
         }
         [EnableQuery]
-        public SingleResult<Customer> Get([FromODataUri] int key)
+        public SingleResult<Artist> Get([FromODataUri] int key)
         {
-            IQueryable<Customer> result = db.Customers.Where(p => p.CustomerId == key);
+            IQueryable<Artist> result = db.Artists.Where(p => p.ArtistId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(Customer Customer)
+        public async Task<IHttpActionResult> Post(Artist Artist)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.Customers.Add(Customer);
+            db.Artists.Add(Artist);
             await db.SaveChangesAsync();
-            return Created(Customer);
+            return Created(Artist);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Customer> Customer)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Artist> Artist)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.Customers.FindAsync(key);
+            var entity = await db.Artists.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            Customer.Patch(entity);
+            Artist.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(key))
+                if (!ArtistExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, Customer update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, Artist update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.CustomerId)
+            if (key != update.ArtistId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(key))
+                if (!ArtistExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var Customer = await db.Customers.FindAsync(key);
-            if (Customer == null)
+            var Artist = await db.Artists.FindAsync(key);
+            if (Artist == null)
             {
                 return NotFound();
             }
-            db.Customers.Remove(Customer);
+            db.Artists.Remove(Artist);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

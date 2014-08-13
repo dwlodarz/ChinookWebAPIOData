@@ -9,12 +9,12 @@ using System.Web.OData;
 
 namespace ChinookWebAPIOData.Controllers
 {
-    public class InvoiceController : ODataController
+    public class PlaylistsController : ODataController
     {
         ChinookModel db = new ChinookModel();
-        private bool InvoiceExists(int key)
+        private bool PlaylistExists(int key)
         {
-            return db.Invoices.Any(p => p.InvoiceId == key);
+            return db.Playlists.Any(p => p.PlaylistId == key);
         }
         protected override void Dispose(bool disposing)
         {
@@ -23,47 +23,47 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<Invoice> Get()
+        public IQueryable<Playlist> Get()
         {
-            return db.Invoices;
+            return db.Playlists;
         }
         [EnableQuery]
-        public SingleResult<Invoice> Get([FromODataUri] int key)
+        public SingleResult<Playlist> Get([FromODataUri] int key)
         {
-            IQueryable<Invoice> result = db.Invoices.Where(p => p.InvoiceId == key);
+            IQueryable<Playlist> result = db.Playlists.Where(p => p.PlaylistId == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(Invoice Invoice)
+        public async Task<IHttpActionResult> Post(Playlist Playlist)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            db.Invoices.Add(Invoice);
+            db.Playlists.Add(Playlist);
             await db.SaveChangesAsync();
-            return Created(Invoice);
+            return Created(Playlist);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Invoice> Invoice)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Playlist> Playlist)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var entity = await db.Invoices.FindAsync(key);
+            var entity = await db.Playlists.FindAsync(key);
             if (entity == null)
             {
                 return NotFound();
             }
-            Invoice.Patch(entity);
+            Playlist.Patch(entity);
             try
             {
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InvoiceExists(key))
+                if (!PlaylistExists(key))
                 {
                     return NotFound();
                 }
@@ -74,13 +74,13 @@ namespace ChinookWebAPIOData.Controllers
             }
             return Updated(entity);
         }
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, Invoice update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, Playlist update)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (key != update.InvoiceId)
+            if (key != update.PlaylistId)
             {
                 return BadRequest();
             }
@@ -91,7 +91,7 @@ namespace ChinookWebAPIOData.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InvoiceExists(key))
+                if (!PlaylistExists(key))
                 {
                     return NotFound();
                 }
@@ -105,12 +105,12 @@ namespace ChinookWebAPIOData.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var Invoice = await db.Invoices.FindAsync(key);
-            if (Invoice == null)
+            var Playlist = await db.Playlists.FindAsync(key);
+            if (Playlist == null)
             {
                 return NotFound();
             }
-            db.Invoices.Remove(Invoice);
+            db.Playlists.Remove(Playlist);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
