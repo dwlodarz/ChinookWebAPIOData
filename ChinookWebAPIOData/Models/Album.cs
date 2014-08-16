@@ -20,7 +20,7 @@ namespace ChinookWebAPIOData.Models
         [StringLength(160)]
         public string Title { get; set; }
 
-        public int ArtistId { get; set; }
+        public int? ArtistId { get; set; }
 
         public virtual Artist Artist { get; set; }
 

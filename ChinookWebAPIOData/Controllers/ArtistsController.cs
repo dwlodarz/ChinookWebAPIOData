@@ -114,5 +114,11 @@ namespace ChinookWebAPIOData.Controllers
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        [EnableQuery]
+        public IQueryable<Album> GetAlbums([FromODataUri] int key)
+        {
+            return db.Artists.Where(m => m.ArtistId == key).SelectMany(m => m.Albums);
+        }
     }
 }

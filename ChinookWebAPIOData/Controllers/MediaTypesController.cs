@@ -114,5 +114,11 @@ namespace ChinookWebAPIOData.Controllers
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        [EnableQuery]
+        public IQueryable<Track> GetTracks([FromODataUri] int key)
+        {
+            return db.MediaTypes.Where(m => m.MediaTypeId == key).SelectMany(m => m.Tracks);
+        }
     }
 }

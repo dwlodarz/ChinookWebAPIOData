@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -111,6 +112,58 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
             db.InvoiceLines.Remove(InvoiceLine);
+            await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        public SingleResult<Invoice> GetInvoice([FromODataUri] int key)
+        {
+            var result = db.InvoiceLines.Where(m => m.InvoiceLineId == key).Select(m => m.Invoice);
+            return SingleResult.Create(result);
+        }
+
+        [EnableQuery]
+        public SingleResult<Track> GetTrack([FromODataUri] int key)
+        {
+            var result = db.InvoiceLines.Where(m => m.InvoiceLineId == key).Select(m => m.Track);
+            return SingleResult.Create(result);
+        }
+
+        [AcceptVerbs("POST", "PUT")]
+        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key,
+            string navigationProperty, [FromBody] Uri link)
+        {
+            var invoiceLine = await db.InvoiceLines.SingleOrDefaultAsync(p => p.InvoiceLineId == key);
+            if (invoiceLine == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "Invoice":
+                    var relatedInvoiceKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var invoice = await db.Invoices.SingleOrDefaultAsync(f => f.InvoiceId == relatedInvoiceKey);
+                    if (invoice == null)
+                    {
+                        return NotFound();
+                    }
+
+                    invoiceLine.Invoice = invoice;
+                    break;
+                case "Track":
+                    var relatedTrackKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var track = await db.Tracks.SingleOrDefaultAsync(f => f.TrackId == relatedTrackKey);
+                    if (track == null)
+                    {
+                        return NotFound();
+                    }
+
+                    invoiceLine.Track = track;
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

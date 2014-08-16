@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -111,6 +112,73 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
             db.Tracks.Remove(Track);
+            await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        public SingleResult<Album> GetAlbum([FromODataUri] int key)
+        {
+            var result = db.Tracks.Where(m => m.TrackId == key).Select(m => m.Album);
+            return SingleResult.Create(result);
+        }
+
+        [EnableQuery]
+        public IQueryable<InvoiceLine> GetInvoiceLines([FromODataUri] int key)
+        {
+            return db.Tracks.Where(m => m.TrackId == key).SelectMany(m => m.InvoiceLines);
+        }
+
+        [EnableQuery]
+        public IQueryable<Playlist> GetPlaylists([FromODataUri] int key)
+        {
+            return db.Tracks.Where(m => m.TrackId == key).SelectMany(m => m.Playlists);
+        }
+
+        [AcceptVerbs("POST", "PUT")]
+        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key,
+            string navigationProperty, [FromBody] Uri link)
+        {
+            var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == key);
+            if (track == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "Album":
+                    var relatedAlbumKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var album = await db.Albums.SingleOrDefaultAsync(f => f.AlbumId == relatedAlbumKey);
+                    if (album == null)
+                    {
+                        return NotFound();
+                    }
+
+                    track.Album = album;
+                    break;
+                case "Genre":
+                    var relatedGenreKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var genre = await db.Genres.SingleOrDefaultAsync(f => f.GenreId == relatedGenreKey);
+                    if (genre == null)
+                    {
+                        return NotFound();
+                    }
+
+                    track.Genre = genre;
+                    break;
+                case "MediaType":
+                    var relatedMediaTypeKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var mediaType = await db.MediaTypes.SingleOrDefaultAsync(f => f.MediaTypeId == relatedMediaTypeKey);
+                    if (mediaType == null)
+                    {
+                        return NotFound();
+                    }
+
+                    track.MediaType = mediaType;
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

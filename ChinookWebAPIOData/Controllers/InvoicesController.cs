@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -111,6 +112,41 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
             db.Invoices.Remove(Invoice);
+            await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        public IQueryable<InvoiceLine> GetInvoiceLines([FromODataUri] int key)
+        {
+            return db.Invoices.Where(m => m.InvoiceId == key).SelectMany(m => m.InvoiceLines);
+        }
+
+        [AcceptVerbs("POST", "PUT")]
+        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key,
+            string navigationProperty, [FromBody] Uri link)
+        {
+            var invoice = await db.Invoices.SingleOrDefaultAsync(p => p.InvoiceId == key);
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "Customer":
+                    var relatedKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var customer = await db.Customers.SingleOrDefaultAsync(f => f.CustomerId == relatedKey);
+                    if (customer == null)
+                    {
+                        return NotFound();
+                    }
+
+                    invoice.Customer = customer;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

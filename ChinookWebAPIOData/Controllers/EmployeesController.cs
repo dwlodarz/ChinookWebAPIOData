@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -111,6 +112,47 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
             db.Employees.Remove(Employee);
+            await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        public IQueryable<Customer> GetCustomers([FromODataUri] int key)
+        {
+            return db.Employees.Where(m => m.EmployeeId == key).SelectMany(m => m.Customers);
+        }
+
+        [EnableQuery]
+        public IQueryable<Employee> GetEmployee1([FromODataUri] int key)
+        {
+            return db.Employees.Where(m => m.EmployeeId == key).SelectMany(m => m.Employee1);
+        }
+
+        [AcceptVerbs("POST", "PUT")]
+        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key,
+            string navigationProperty, [FromBody] Uri link)
+        {
+            var employee = await db.Employees.SingleOrDefaultAsync(p => p.EmployeeId == key);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "Employee2":
+                    var relatedKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var employee2 = await db.Employees.SingleOrDefaultAsync(f => f.EmployeeId == relatedKey);
+                    if (employee2 == null)
+                    {
+                        return NotFound();
+                    }
+
+                    employee.Employee2 = employee2;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }

@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -111,6 +112,48 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
             db.Albums.Remove(Album);
+            await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        public IQueryable<Track> GetTracks([FromODataUri] int key)
+        {
+            return db.Albums.Where(m => m.AlbumId == key).SelectMany(m => m.Tracks);
+        }
+
+        [EnableQuery]
+        public SingleResult<Artist> GetArtist([FromODataUri] int key)
+        {
+            var result = db.Albums.Where(m => m.AlbumId == key).Select(m => m.Artist);
+            return SingleResult.Create(result);
+        }
+
+        [AcceptVerbs("POST", "PUT")]
+        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key,
+            string navigationProperty, [FromBody] Uri link)
+        {
+            var album = await db.Albums.SingleOrDefaultAsync(p => p.AlbumId == key);
+            if (album == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "Artist":
+                    var relatedKey = Helpers.GetKeyFromUri<int>(Request, link);
+                    var artist = await db.Artists.SingleOrDefaultAsync(f => f.ArtistId == relatedKey);
+                    if (artist == null)
+                    {
+                        return NotFound();
+                    }
+
+                    album.Artist = artist;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
