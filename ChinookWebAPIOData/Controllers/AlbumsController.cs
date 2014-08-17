@@ -157,5 +157,58 @@ namespace ChinookWebAPIOData.Controllers
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        string navigationProperty, [FromBody] Uri link)
+        {
+            var album = await db.Albums.SingleOrDefaultAsync(p => p.AlbumId == key);
+            if (album == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Artist":
+                    album.Artist = null;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        [FromODataUri] string relatedKey, string navigationProperty)
+        {
+            var album = await db.Albums.SingleOrDefaultAsync(p => p.AlbumId == key);
+            if (album == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Tracks":
+                    var trackId = Convert.ToInt32(relatedKey);
+                    var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == trackId);
+
+                    if (track == null)
+                    {
+                        return NotFound();
+                    }
+                    track.Album = null;
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
     }
 }

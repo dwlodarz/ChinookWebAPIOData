@@ -124,6 +124,20 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
+        public SingleResult<Genre> GetGenre([FromODataUri] int key)
+        {
+            var result = db.Tracks.Where(m => m.TrackId == key).Select(m => m.Genre);
+            return SingleResult.Create(result);
+        }
+
+        [EnableQuery]
+        public SingleResult<MediaType> GetMediaType([FromODataUri] int key)
+        {
+            var result = db.Tracks.Where(m => m.TrackId == key).Select(m => m.MediaType);
+            return SingleResult.Create(result);
+        }
+
+        [EnableQuery]
         public IQueryable<InvoiceLine> GetInvoiceLines([FromODataUri] int key)
         {
             return db.Tracks.Where(m => m.TrackId == key).SelectMany(m => m.InvoiceLines);
@@ -180,6 +194,75 @@ namespace ChinookWebAPIOData.Controllers
                     return StatusCode(HttpStatusCode.NotImplemented);
             }
             await db.SaveChangesAsync();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        string navigationProperty, [FromBody] Uri link)
+        {
+            var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == key);
+            if (track == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Album":
+                    track.Album = null;
+                    break;
+                case "Genre":
+                    track.Genre = null;
+                    break;
+                case "MediaType":
+                    track.MediaType = null;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        [FromODataUri] string relatedKey, string navigationProperty)
+        {
+            var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == key);
+            if (track == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "InvoiceLines":
+                    var invoiveLineId = Convert.ToInt32(relatedKey);
+                    var invoiveLine = await db.InvoiceLines.SingleOrDefaultAsync(p => p.InvoiceLineId == invoiveLineId);
+
+                    if (invoiveLine == null)
+                    {
+                        return NotFound();
+                    }
+                    invoiveLine.Track = null;
+                    break;
+                //case "Playlist":
+                //    var playlistId = Convert.ToInt32(relatedKey);
+                //    var playlist = await db.Playlists.SingleOrDefaultAsync(p => p.PlaylistId == playlistId);
+
+                //    if (playlist == null)
+                //    {
+                //        return NotFound();
+                //    }
+                //    playlist.Track = null;
+                //    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+
+            }
+            await db.SaveChangesAsync();
+
             return StatusCode(HttpStatusCode.NoContent);
         }
     }

@@ -156,5 +156,68 @@ namespace ChinookWebAPIOData.Controllers
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        string navigationProperty, [FromBody] Uri link)
+        {
+            var employee = await db.Employees.SingleOrDefaultAsync(p => p.EmployeeId == key);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Employee2":
+                    employee.Employee2 = null;
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        [FromODataUri] string relatedKey, string navigationProperty)
+        {
+            var employee = await db.Employees.SingleOrDefaultAsync(p => p.EmployeeId == key);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Customers":
+                    var customerId = Convert.ToInt32(relatedKey);
+                    var customer = await db.Customers.SingleOrDefaultAsync(p => p.CustomerId == customerId);
+
+                    if (customer == null)
+                    {
+                        return NotFound();
+                    }
+                    customer.Employee = null;
+                    break;
+                case "Employee1":
+                    var employeeId = Convert.ToInt32(relatedKey);
+                    var employee1 = await db.Employees.SingleOrDefaultAsync(p => p.EmployeeId == employeeId);
+
+                    if (employee1 == null)
+                    {
+                        return NotFound();
+                    }
+                    employee1.Employee1 = null;
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
     }
 }

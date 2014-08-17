@@ -1,4 +1,5 @@
 ﻿using ChinookWebAPIOData.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -119,6 +120,36 @@ namespace ChinookWebAPIOData.Controllers
         public IQueryable<Track> GetTracks([FromODataUri] int key)
         {
             return db.Playlists.Where(m => m.PlaylistId == key).SelectMany(m => m.Tracks);
+        }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        [FromODataUri] string relatedKey, string navigationProperty)
+        {
+            var playlist = await db.Playlists.SingleOrDefaultAsync(p => p.PlaylistId == key);
+            if (playlist == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                //case "Tracks":
+                //    var trackId = Convert.ToInt32(relatedKey);
+                //    var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == trackId);
+
+                //    if (track == null)
+                //    {
+                //        return NotFound();
+                //    }
+                //    track.Playlists = null;
+                //    break;
+                //default:
+                //    return StatusCode(HttpStatusCode.NotImplemented);
+
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }

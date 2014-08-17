@@ -167,5 +167,30 @@ namespace ChinookWebAPIOData.Controllers
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key,
+        string navigationProperty, [FromBody] Uri link)
+        {
+            var invoiceLine = await db.InvoiceLines.SingleOrDefaultAsync(p => p.InvoiceLineId == key);
+            if (invoiceLine == null)
+            {
+                return NotFound();
+            }
+
+            switch (navigationProperty)
+            {
+                case "Invoice":
+                    invoiceLine.Invoice = null;
+                    break;
+                case "Track":
+                    invoiceLine.Track = null;
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }        
     }
 }
