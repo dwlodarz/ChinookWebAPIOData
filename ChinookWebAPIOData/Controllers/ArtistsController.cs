@@ -1,4 +1,5 @@
-﻿using ChinookWebAPIOData.Models;
+﻿using ChinookWebAPIOData.Extensions;
+using ChinookWebAPIOData.Models;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
+using System.Web.OData.Routing;
 
 namespace ChinookWebAPIOData.Controllers
 {
@@ -23,7 +25,29 @@ namespace ChinookWebAPIOData.Controllers
             base.Dispose(disposing);
         }
 
-        [EnableQuery]
+        [HttpPost]
+        [ODataRoute("CreateArtist")]
+        public IHttpActionResult CreateArtist(ODataActionParameters parameters)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            string name = parameters["Name"] as string;
+
+            Artist artist = new Artist()
+            {
+                Name = name,
+            };
+
+            db.Artists.Add(artist);
+
+            return Created(artist);
+        }
+
+        //[EnableQuery]
+        [MyQueryable]
         public IQueryable<Artist> Get()
         {
             return db.Artists;

@@ -177,6 +177,8 @@
     <Compile Include="Controllers\MediaTypesController.cs" />
     <Compile Include="Controllers\PlaylistsController.cs" />
     <Compile Include="Controllers\TracksController.cs" />
+    <Compile Include="Extensions\MyOrderByValidator.cs" />
+    <Compile Include="Extensions\MyQueryableAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

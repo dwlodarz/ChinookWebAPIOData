@@ -1,5 +1,6 @@
 ﻿using ChinookWebAPIOData.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -7,12 +8,24 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
+using System.Web.OData.Routing;
 
 namespace ChinookWebAPIOData.Controllers
 {
     public class InvoicesController : ODataController
     {
         ChinookModel db = new ChinookModel();
+        private static ConcurrentDictionary<int, Invoice> _data;
+
+        static InvoicesController()
+        {
+            _data = new ConcurrentDictionary<int, Invoice>();
+        }
+
+        public InvoicesController()
+        {
+        }
+
         private bool InvoiceExists(int key)
         {
             return db.Invoices.Any(p => p.InvoiceId == key);
@@ -21,6 +34,58 @@ namespace ChinookWebAPIOData.Controllers
         {
             db.Dispose();
             base.Dispose(disposing);
+        }
+
+        [HttpGet]
+        public IHttpActionResult CalculateSalesTax(int key, string state)
+        {
+            decimal taxRate = GetRate(state);
+
+            Invoice invoice;
+            if (_data.TryGetValue(key, out invoice))
+            {
+                decimal tax = invoice.Total * taxRate / 100;
+                return Ok(tax);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        private static decimal GetRate(string state)
+        {
+            decimal taxRate = 0;
+            switch (state)
+            {
+                case "AZ": taxRate = 5.6M; break;
+                case "CA": taxRate = 7.5M; break;
+                case "CT": taxRate = 6.35M; break;
+                case "GA": taxRate = 4M; break;
+                case "IN": taxRate = 7M; break;
+                case "KS": taxRate = 6.15M; break;
+                case "KY": taxRate = 6M; break;
+                case "MA": taxRate = 6.25M; break;
+                case "MI": taxRate = 6.5M; break;
+                case "NV": taxRate = 6.85M; break;
+                case "NJ": taxRate = 7M; break;
+                case "NY": taxRate = 4; break;
+                case "NC": taxRate = 4.75M; break;
+                case "ND": taxRate = 5; break;
+                case "PA": taxRate = 6; break;
+                case "TN": taxRate = 7; break;
+                case "TX": taxRate = 6.25M; break;
+                case "VA": taxRate = 4.3M; break;
+                case "WA": taxRate = 6.5M; break;
+                case "WV": taxRate = 6.0M; break;
+                case "WI": taxRate = 5.0M; break;
+
+                default:
+                    taxRate = 0;
+                    break;
+            }
+
+            return taxRate;
         }
 
         [EnableQuery]
