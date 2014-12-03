@@ -131,22 +131,22 @@ namespace ChinookWebAPIOData.Controllers
                 return NotFound();
             }
 
-            switch (navigationProperty)
-            {
-                //case "Tracks":
-                //    var trackId = Convert.ToInt32(relatedKey);
-                //    var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == trackId);
+            //switch (navigationProperty)
+            //{
+            //    case "Tracks":
+            //        var trackId = Convert.ToInt32(relatedKey);
+            //        var track = await db.Tracks.SingleOrDefaultAsync(p => p.TrackId == trackId);
 
-                //    if (track == null)
-                //    {
-                //        return NotFound();
-                //    }
-                //    track.Playlists = null;
-                //    break;
-                //default:
-                //    return StatusCode(HttpStatusCode.NotImplemented);
+            //        if (track == null)
+            //        {
+            //            return NotFound();
+            //        }
+            //        track.Playlists = null;
+            //        break;
+            //    default:
+            //        return StatusCode(HttpStatusCode.NotImplemented);
 
-            }
+            //}
             await db.SaveChangesAsync();
 
             return StatusCode(HttpStatusCode.NoContent);

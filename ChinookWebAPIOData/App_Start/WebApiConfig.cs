@@ -25,28 +25,29 @@ namespace ChinookWebAPIOData
             builder.EntitySet<Playlist>("Playlists");
             builder.EntitySet<Track>("Tracks");
 
+            // Fix for the DateTime/DateTimeOffset issue
             var inv = builder.StructuralTypes.First(t => t.ClrType == typeof(Invoice));
             inv.AddProperty(typeof(Invoice).GetProperty("InvoiceDateOffset"));
             var invoice = builder.EntityType<Invoice>();
 
             invoice.Ignore(t => t.InvoiceDate);
 
+            // Adding a Function
             var invoiceType = builder.EntityType<Invoice>();
-
-            // Function bound to a single entity
-            // Accept a string as parameter and return a double
-            // This function calculate the sales tax base on the 
-            // state
 
             invoiceType
                 .Function("CalculateSalesTax")
                 .Returns<decimal>()
                 .Parameter<string>("state");
 
-            ActionConfiguration createArtistAction = builder.Action("CreateArtist");
-            createArtistAction.Parameter<string>("Name");
-            createArtistAction.ReturnsFromEntitySet<Artist>("Artists");
+            // Adding an Actions
 
+            // Buy
+            // URI: ~/odata/Albums(2)/ChinookWebAPIOData.Models.Buy
+            ActionConfiguration checkOutAction = builder.EntityType<Album>().Action("Buy");
+            checkOutAction.ReturnsFromEntitySet<Album>("Albums");
+
+            // Adding custom Query Validators
             config.AddODataQueryFilter(new MyQueryableAttribute());
 
             config.MapODataServiceRoute(

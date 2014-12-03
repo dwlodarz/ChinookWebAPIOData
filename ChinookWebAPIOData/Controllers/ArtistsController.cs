@@ -25,28 +25,7 @@ namespace ChinookWebAPIOData.Controllers
             base.Dispose(disposing);
         }
 
-        [HttpPost]
-        [ODataRoute("CreateArtist")]
-        public IHttpActionResult CreateArtist(ODataActionParameters parameters)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            string name = parameters["Name"] as string;
-
-            Artist artist = new Artist()
-            {
-                Name = name,
-            };
-
-            db.Artists.Add(artist);
-
-            return Created(artist);
-        }
-
-        //[EnableQuery]
+        [EnableQuery(PageSize = 10)]
         [MyQueryable]
         public IQueryable<Artist> Get()
         {

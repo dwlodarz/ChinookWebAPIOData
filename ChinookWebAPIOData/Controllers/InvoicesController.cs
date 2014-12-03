@@ -37,14 +37,14 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult CalculateSalesTax(int key, string state)
+        public IHttpActionResult CalculateSalesTax([FromODataUri] int key, string state)
         {
             decimal taxRate = GetRate(state);
 
-            Invoice invoice;
-            if (_data.TryGetValue(key, out invoice))
+            var inv = db.Invoices.FirstOrDefault(p => p.InvoiceId == key);
+            if (inv != null)
             {
-                decimal tax = invoice.Total * taxRate / 100;
+                decimal tax = inv.Total * taxRate / 100;
                 return Ok(tax);
             }
             else
