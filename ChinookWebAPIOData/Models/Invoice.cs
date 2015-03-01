@@ -20,18 +20,18 @@ namespace ChinookWebAPIOData.Models
 
         public int CustomerId { get; set; }
 
-        public DateTime InvoiceDate
+        public DateTimeOffset InvoiceDate
         {
             get { return dtw; }
             set { dtw = value; }
         }
 
-        [NotMapped]
-        public DateTimeOffset InvoiceDateOffset
-        {
-            get { return dtw; }
-            set { dtw = value; }
-        }
+        //[NotMapped]
+        //public DateTimeOffset InvoiceDateOffset
+        //{
+        //    get { return dtw; }
+        //    set { dtw = value; }
+        //}
 
         [StringLength(70)]
         public string BillingAddress { get; set; }

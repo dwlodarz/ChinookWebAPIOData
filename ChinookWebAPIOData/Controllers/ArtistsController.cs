@@ -25,7 +25,7 @@ namespace ChinookWebAPIOData.Controllers
             base.Dispose(disposing);
         }
 
-        [EnableQuery(PageSize = 200)]
+        [EnableQuery]
         [MyQueryable]
         public IQueryable<Artist> Get()
         {

@@ -24,27 +24,27 @@ namespace ChinookWebAPIOData.Controllers
             base.Dispose(disposing);
         }
 
-        [HttpPost]
-        public async Task<IHttpActionResult> Buy([FromODataUri] int key, ODataActionParameters parameters)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+        //[HttpPost]
+        //public async Task<IHttpActionResult> Buy([FromODataUri] int key, ODataActionParameters parameters)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            var album = db.Albums.FirstOrDefault(a => a.AlbumId == key);
+        //    var album = db.Albums.FirstOrDefault(a => a.AlbumId == key);
 
-            if (album == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(album);
-            }
-        }
+        //    if (album == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    else
+        //    {
+        //        return Ok(album);
+        //    }
+        //}
 
-        [EnableQuery(PageSize = 200)]
+        [EnableQuery]
         public IQueryable<Album> Get()
         {
             return db.Albums;

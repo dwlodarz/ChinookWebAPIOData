@@ -36,57 +36,57 @@ namespace ChinookWebAPIOData.Controllers
             base.Dispose(disposing);
         }
 
-        [HttpGet]
-        public IHttpActionResult CalculateSalesTax([FromODataUri] int key, string state)
-        {
-            decimal taxRate = GetRate(state);
+        //[HttpGet]
+        //public IHttpActionResult CalculateSalesTax([FromODataUri] int key, string state)
+        //{
+        //    decimal taxRate = GetRate(state);
 
-            var inv = db.Invoices.FirstOrDefault(p => p.InvoiceId == key);
-            if (inv != null)
-            {
-                decimal tax = inv.Total * taxRate / 100;
-                return Ok(tax);
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
+        //    var inv = db.Invoices.FirstOrDefault(p => p.InvoiceId == key);
+        //    if (inv != null)
+        //    {
+        //        decimal tax = inv.Total * taxRate / 100;
+        //        return Ok(tax);
+        //    }
+        //    else
+        //    {
+        //        return NotFound();
+        //    }
+        //}
 
-        private static decimal GetRate(string state)
-        {
-            decimal taxRate = 0;
-            switch (state)
-            {
-                case "AZ": taxRate = 5.6M; break;
-                case "CA": taxRate = 7.5M; break;
-                case "CT": taxRate = 6.35M; break;
-                case "GA": taxRate = 4M; break;
-                case "IN": taxRate = 7M; break;
-                case "KS": taxRate = 6.15M; break;
-                case "KY": taxRate = 6M; break;
-                case "MA": taxRate = 6.25M; break;
-                case "MI": taxRate = 6.5M; break;
-                case "NV": taxRate = 6.85M; break;
-                case "NJ": taxRate = 7M; break;
-                case "NY": taxRate = 4; break;
-                case "NC": taxRate = 4.75M; break;
-                case "ND": taxRate = 5; break;
-                case "PA": taxRate = 6; break;
-                case "TN": taxRate = 7; break;
-                case "TX": taxRate = 6.25M; break;
-                case "VA": taxRate = 4.3M; break;
-                case "WA": taxRate = 6.5M; break;
-                case "WV": taxRate = 6.0M; break;
-                case "WI": taxRate = 5.0M; break;
+        //private static decimal GetRate(string state)
+        //{
+        //    decimal taxRate = 0;
+        //    switch (state)
+        //    {
+        //        case "AZ": taxRate = 5.6M; break;
+        //        case "CA": taxRate = 7.5M; break;
+        //        case "CT": taxRate = 6.35M; break;
+        //        case "GA": taxRate = 4M; break;
+        //        case "IN": taxRate = 7M; break;
+        //        case "KS": taxRate = 6.15M; break;
+        //        case "KY": taxRate = 6M; break;
+        //        case "MA": taxRate = 6.25M; break;
+        //        case "MI": taxRate = 6.5M; break;
+        //        case "NV": taxRate = 6.85M; break;
+        //        case "NJ": taxRate = 7M; break;
+        //        case "NY": taxRate = 4; break;
+        //        case "NC": taxRate = 4.75M; break;
+        //        case "ND": taxRate = 5; break;
+        //        case "PA": taxRate = 6; break;
+        //        case "TN": taxRate = 7; break;
+        //        case "TX": taxRate = 6.25M; break;
+        //        case "VA": taxRate = 4.3M; break;
+        //        case "WA": taxRate = 6.5M; break;
+        //        case "WV": taxRate = 6.0M; break;
+        //        case "WI": taxRate = 5.0M; break;
 
-                default:
-                    taxRate = 0;
-                    break;
-            }
+        //        default:
+        //            taxRate = 0;
+        //            break;
+        //    }
 
-            return taxRate;
-        }
+        //    return taxRate;
+        //}
 
         [EnableQuery]
         public IQueryable<Invoice> Get()

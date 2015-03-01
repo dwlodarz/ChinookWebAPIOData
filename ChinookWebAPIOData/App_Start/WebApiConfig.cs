@@ -26,29 +26,29 @@ namespace ChinookWebAPIOData
             builder.EntitySet<Track>("Tracks");
 
             // Fix for the DateTime/DateTimeOffset issue
-            var inv = builder.StructuralTypes.First(t => t.ClrType == typeof(Invoice));
-            inv.AddProperty(typeof(Invoice).GetProperty("InvoiceDateOffset"));
-            var invoice = builder.EntityType<Invoice>();
+            //var inv = builder.StructuralTypes.First(t => t.ClrType == typeof(Invoice));
+            //inv.AddProperty(typeof(Invoice).GetProperty("InvoiceDateOffset"));
+            //var invoice = builder.EntityType<Invoice>();
 
-            invoice.Ignore(t => t.InvoiceDate);
+            //invoice.Ignore(t => t.InvoiceDate);
 
             // Adding a Function
-            var invoiceType = builder.EntityType<Invoice>();
+            //var invoiceType = builder.EntityType<Invoice>();
 
-            invoiceType
-                .Function("CalculateSalesTax")
-                .Returns<decimal>()
-                .Parameter<string>("state");
+            //invoiceType
+            //    .Function("CalculateSalesTax")
+            //    .Returns<decimal>()
+            //    .Parameter<string>("state");
 
             // Adding an Actions
 
             // Buy
             // URI: ~/odata/Albums(2)/ChinookWebAPIOData.Models.Buy
-            ActionConfiguration checkOutAction = builder.EntityType<Album>().Action("Buy");
-            checkOutAction.ReturnsFromEntitySet<Album>("Albums");
+            //ActionConfiguration checkOutAction = builder.EntityType<Album>().Action("Buy");
+            //checkOutAction.ReturnsFromEntitySet<Album>("Albums");
 
             // Adding custom Query Validators
-            config.AddODataQueryFilter(new MyQueryableAttribute());
+            //config.AddODataQueryFilter(new MyQueryableAttribute());
 
             config.MapODataServiceRoute(
                 routeName: "ODataRoute",
