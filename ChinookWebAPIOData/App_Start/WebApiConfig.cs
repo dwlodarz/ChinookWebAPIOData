@@ -17,7 +17,15 @@ namespace ChinookWebAPIOData
             builder.EntitySet<Album>("Albums");
             builder.EntitySet<Artist>("Artists");
             builder.EntitySet<Customer>("Customers");
+
             builder.EntitySet<Employee>("Employees");
+            builder.Namespace = "ProductService";
+            builder.EntityType<Employee>().Collection
+    .Function("MostExpensive")
+    .Returns<double>(); //.Parameter<int>("key");
+            builder.Function("GetSalesTaxRate")
+    .Returns<double>()
+    .Parameter<int>("PostalCode");
             builder.EntitySet<Genre>("Genres");
             builder.EntitySet<Invoice>("Invoices");
             builder.EntitySet<InvoiceLine>("InvoiceLines");

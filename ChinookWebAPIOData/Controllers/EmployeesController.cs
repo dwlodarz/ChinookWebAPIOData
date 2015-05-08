@@ -7,6 +7,9 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
+using System.Web.OData.Extensions;
+using System.Web.OData.Query;
+using System.Web.OData.Routing;
 
 namespace ChinookWebAPIOData.Controllers
 {
@@ -22,7 +25,8 @@ namespace ChinookWebAPIOData.Controllers
             db.Dispose();
             base.Dispose(disposing);
         }
-
+       // https://localhost/ChinookWebAPIOData/Employees/$count
+        //[EnableQuery(AllowedQueryOptions= AllowedQueryOptions.Filter)]
         [EnableQuery]
         public IQueryable<Employee> Get()
         {
@@ -46,6 +50,12 @@ namespace ChinookWebAPIOData.Controllers
             return Created(Employee);
         }
 
+        //https://localhost/ChinookWebAPIOData/Employees(1)
+        //User-Agent: Fiddler
+        //Host: localhost
+        //Content-Type: application/json
+        //Content-Length: 47
+        //{ "LastName": "test_l12","FirstName": "test_f12"}
         public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Employee> Employee)
         {
             if (!ModelState.IsValid)
@@ -117,9 +127,28 @@ namespace ChinookWebAPIOData.Controllers
         }
 
         [EnableQuery]
-        public IQueryable<Customer> GetCustomers([FromODataUri] int key)
+        [HttpGet]
+        public int GetCustomers()
         {
-            return db.Employees.Where(m => m.EmployeeId == key).SelectMany(m => m.Customers);
+            int key = 1;
+            return db.Employees.Where(m => m.EmployeeId == key).SelectMany(m => m.Customers).Count();
+        }
+
+        //https://localhost/ChinookWebAPIOData/Employees/ProductService.MostExpensive
+        [HttpGet]
+        public IHttpActionResult MostExpensive()
+        {
+            var product = db.Employees.Max(x => x.EmployeeId);
+            return Ok(product);
+        }
+
+        //https://localhost/ChinookWebAPIOData/GetSalesTaxRate(PostalCode=10)
+        [HttpGet]
+        [ODataRoute("GetSalesTaxRate(PostalCode={postalCode})")]
+        public IHttpActionResult GetSalesTaxRate([FromODataUri] int postalCode)
+        {
+            double rate = 5.6;  // Use a fake number for the sample.
+            return Ok(rate);
         }
 
         [EnableQuery]
